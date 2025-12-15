@@ -25,13 +25,13 @@ public:
 
 
 
-
-
 private:
     std::vector<float> X_;
     std::vector<float> y_;
     int n_rows_;
     int n_cols_;
+
+
 
 
 };

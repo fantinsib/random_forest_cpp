@@ -1,5 +1,6 @@
 #include <myforest/node.h>
 #include "myforest/dataset.h"
+#include "myforest/decisiontree.h"
 
 #include <iostream>
 #include <vector>
@@ -47,15 +48,21 @@ int main()
                          4,5,9,
                          8,6,2};
 
-    std::vector<float> y{1,0,1,1};
+    std::vector<float> y{0,0,1,1};
 
     myforest::DataSet data(v, y, 4, 3);
 
+    myforest::DecisionTree tree(3);
 
-    float e = data.iloc_x(2,0);
+    std::pair<int, int> results = tree.count(data.y());
+
+    std::cout<< results.first<< std::endl;
+    std::cout<< results.second<< std::endl;
 
 
-    std::cout<< e<< std::endl;
+    float gini_score = tree.gini_score(results.first, results.second);
+    std::cout << gini_score << std::endl;
+
 
 
 }
