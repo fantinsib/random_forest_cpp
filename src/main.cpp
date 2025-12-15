@@ -1,7 +1,9 @@
 #include <myforest/node.h>
 #include "myforest/dataset.h"
+
 #include <iostream>
 #include <vector>
+#include <span>
 
 
 
@@ -24,12 +26,36 @@ void print_vector_2(std::vector<float>& x){
 
 }
 
+template <typename T>
+auto return_row(int row, const std::vector<T>& v, int num_row, int num_col){
+
+    std::span<const T> cs(v);
+    auto sub = cs.subspan(row*num_col, num_col);
+    return sub;
+
+
+}
+
+
 int main()
 {
 
-    std::vector<float> v{1,2,3,4};
 
-    print_vector(v);
-    print_vector_2(v);
+
+    std::vector<float> v{4,1,3,
+                         2,3,5,
+                         4,5,9,
+                         8,6,2};
+
+    std::vector<float> y{1,0,1,1};
+
+    myforest::DataSet data(v, y, 4, 3);
+
+
+    float e = data.iloc_x(2,0);
+
+
+    std::cout<< e<< std::endl;
+
 
 }

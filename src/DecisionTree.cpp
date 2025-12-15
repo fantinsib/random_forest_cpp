@@ -9,8 +9,6 @@ DecisionTree::DecisionTree(int max_depth_):
 
 float DecisionTree::gini_score(int k, float p){
 
-
-
-
+    return 0.f;
 }
 

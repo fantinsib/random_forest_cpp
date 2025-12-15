@@ -1,6 +1,7 @@
 #ifndef DATASET_H
 #define DATASET_H
 #include <vector>
+#include <span>
 
 
 namespace myforest{
@@ -17,6 +18,11 @@ public:
     float iloc_x(int row, int col) const {return X_[col +row*n_cols_];}
     float iloc_y(int row) const {return y_[row];}
 
+    std::span<const float> row_X(int row) const;
+    std::span<const float> row_y(int row) const;
+
+
+
 
 
 
@@ -29,5 +35,6 @@ private:
 
 
 };
+
 }
 #endif // DATASET_H
