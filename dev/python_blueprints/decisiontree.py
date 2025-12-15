@@ -69,7 +69,6 @@ class DecisionTree:
 
         return node, x_left_child, x_right_child, y_left_child, y_right_child
 
-    def fit(self):
 
 
         
