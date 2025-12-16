@@ -22,19 +22,27 @@ public:
     std::span<const float> row_y(int row) const;
 
 
-
-
-
 private:
     std::vector<float> X_;
     std::vector<float> y_;
     int n_rows_;
     int n_cols_;
+};
 
+class Table
+{
 
+public:
+    Table(std::vector<float> x, int n_row, int n_col);
+
+    std::vector<float> X_;
+    int n_rows_;
+    int n_cols_;
 
 
 };
+
+
 
 }
 #endif // DATASET_H

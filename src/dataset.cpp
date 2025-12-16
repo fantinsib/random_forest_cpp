@@ -26,6 +26,15 @@ std::span<const float> DataSet::row_y(int row) const {
     return sub;
 }
 
+Table::Table(std::vector<float> x, int n_row, int n_col):
+
+    X_(x),
+    n_rows_(n_row),
+    n_cols_(n_col)
+
+{}
+
+
 
 
 

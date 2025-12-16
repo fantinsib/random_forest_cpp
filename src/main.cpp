@@ -43,10 +43,10 @@ int main()
 
 
 
-    std::vector<float> v{4,1,3,
-                         2,3,5,
-                         4,5,9,
-                         8,6,2};
+    std::vector<float> v{1,2,3,
+                         4,5,6,
+                         7,8,9,
+                         10,11,12};
 
     std::vector<float> y{0,0,1,1};
 
@@ -56,13 +56,11 @@ int main()
 
     std::pair<int, int> results = tree.count(data.y());
 
-    std::cout<< results.first<< std::endl;
-    std::cout<< results.second<< std::endl;
-
 
     float gini_score = tree.gini_score(results.first, results.second);
     std::cout << gini_score << std::endl;
 
+    tree.best_split(data);
 
 
 }
