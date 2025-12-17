@@ -27,26 +27,16 @@ void print_vector_2(std::vector<float>& x){
 
 }
 
-template <typename T>
-auto return_row(int row, const std::vector<T>& v, int num_row, int num_col){
-
-    std::span<const T> cs(v);
-    auto sub = cs.subspan(row*num_col, num_col);
-    return sub;
-
-
-}
-
 
 int main()
 {
 
 
 
-    std::vector<float> v{1,2,3,
-                         4,5,6,
-                         7,8,9,
-                         10,11,12};
+    std::vector<float> v{1,1,3,
+                         1,1,6,
+                         1,2,6,
+                         1,2,12};
 
     std::vector<float> y{0,0,1,1};
 

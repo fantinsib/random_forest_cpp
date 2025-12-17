@@ -1,5 +1,6 @@
 #include "myforest/decisiontree.h"
 #include "myforest/dataset.h"
+#include "myforest/node.h"
 #include <span>
 #include <algorithm>
 
@@ -11,14 +12,11 @@ DecisionTree::DecisionTree(int max_depth_):
 {}
 
 
-float DecisionTree::gini_score(int pos_score, int neg_score){
-
+float DecisionTree::gini_score(int pos_score, int neg_score) const{
     float total = pos_score+neg_score;
     float gini = 1-((pos_score/total)*(pos_score/total) + (neg_score/total)*(neg_score/total));
-
     return gini;
 }
-
 
 const std::pair<int, int> DecisionTree::count(const std::vector<float>& y) const{
     int count_positive = 0;
@@ -31,7 +29,6 @@ const std::pair<int, int> DecisionTree::count(const std::vector<float>& y) const
     }
     return {count_positive, count_negative};
 }
-
 
 const std::vector<float> DecisionTree::thresholds(const std::vector<float>& X) const{
 
@@ -52,82 +49,72 @@ std::pair<int, int> DecisionTree::best_split(const DataSet& data) const{
 
 
 
-    std::pair<int, float> best_col_and_t;
+    float best_w_gini = 1;
+    float best_threshold;
+    int split_feature;
 
+    //iterating columns:
     for (int col = 0; col < n_col; col++){
-        // Identifying thresholds:
 
-        //Fetching the col and sorting:
-
+        //Preparing the thresholds :
+        //Getting the col values
         std::vector<float> sorted_col(n_row);
-
         for (int i =0; i<n_row; i++)
         {
             sorted_col[i] = data.iloc_x(i, col);
-
         }
         // sorting:
         std::sort(sorted_col.begin(), sorted_col.end());
-
+        //computing & storing the thresholds in a vector:
         std::vector<float> thresholds;
-
         for (int row = 1; row < n_row; row++){
 
             float a = sorted_col[row-1];
             float b = sorted_col[row];
 
-            if (a!=b) {float t = (a+b)*0.5;}
-
-
-            thresholds.push_back(t);
-
+            if (a!=b) {
+                float t = (a+b)*0.5;
+                thresholds.push_back(t);
+            }
     }
-        std::cout << "Thresholds"<< std::endl;
+
+    //Splitting the col for each of the thresholds:
         for (auto v : thresholds){
             int count_pos_left= 0;
             int count_pos_right=0;
             int count_neg_left=0;
             int count_neg_right=0;
             for (int i = 0; i < n_row; i++){
-
-
-                std::cout << data.iloc_x(i, col) << std::endl;
-
                 if (data.iloc_x(i, col) >= v)
                 {
                     if (data.iloc_y(i) == 1) {count_pos_right++;}
                     if (data.iloc_y(i) == 0) {count_neg_right++;}
-
                 }
                 if (data.iloc_x(i, col) < v)
                 {
                     if (data.iloc_y(i) == 1) {count_pos_left++;}
                     if (data.iloc_y(i) == 0) {count_neg_left++;}
-
                 }
-
             }
+            //Computing the resulting gini of the two nodes:
+            float gini_left = gini_score(count_pos_left, count_neg_left);
+            float gini_right = gini_score(count_pos_right, count_neg_right);
+            float w_gini = gini_left*(count_pos_left+count_neg_left)/n_row
+                           + gini_right*(count_pos_right+count_neg_right)/n_row;
 
-            std::cout<< "Distribution count for col " << col << " and v "<< v << std::endl;
-            std::cout << "Left" << std::endl;
-            std::cout << count_pos_left << " " << count_neg_left << std::endl;
-            std::cout << "Right" << std::endl;
-            std::cout << count_pos_right << " " << count_neg_right << std::endl;
-
-
-
-
-
-
-
-
+            //Is best split so far ?
+            if (w_gini < best_w_gini){
+                best_w_gini = w_gini;
+                best_threshold = v;
+                split_feature = col;
+                }
         }
-
-
-
-
-
     }
+
+    std::cout << "RESULTS" << std::endl << "Gini :" << best_w_gini << " | Best t : " << best_threshold << " | Split on col "<<split_feature << std::endl;
+
+
+
 
 
 

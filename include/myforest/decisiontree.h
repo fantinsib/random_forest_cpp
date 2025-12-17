@@ -2,6 +2,7 @@
 #define DECISIONTREE_H
 #include <iostream>
 #include <myforest/dataset.h>
+#include <myforest/node.h>
 
 
 namespace myforest{
@@ -12,7 +13,7 @@ public:
     int max_depth;
     int num_features;
 
-    float gini_score(int pos_score, int neg_score);
+    float gini_score(int pos_score, int neg_score) const;
     const std::pair<int,int> count(const std::vector<float>& y) const;
 
 //private:
