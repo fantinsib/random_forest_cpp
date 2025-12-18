@@ -39,7 +39,7 @@ const std::vector<float> DecisionTree::thresholds(const std::vector<float>& X) c
 
 }
 
-std::pair<int, int> DecisionTree::best_split(const DataSet& data) const{
+SplitResult DecisionTree::best_split(const DataSet& data) const{
 
     const std::vector<float>& x = data.X();
     const std::vector<float>& y = data.y();
@@ -52,6 +52,8 @@ std::pair<int, int> DecisionTree::best_split(const DataSet& data) const{
     float best_w_gini = 1;
     float best_threshold;
     int split_feature;
+    std::vector<int> top_left_index;
+    std::vector<int> top_right_index;
 
     //iterating columns:
     for (int col = 0; col < n_col; col++){
@@ -84,16 +86,23 @@ std::pair<int, int> DecisionTree::best_split(const DataSet& data) const{
             int count_pos_right=0;
             int count_neg_left=0;
             int count_neg_right=0;
+
+            std::vector<int> left_index;
+            std::vector<int> right_index;
+
+
             for (int i = 0; i < n_row; i++){
                 if (data.iloc_x(i, col) >= v)
                 {
                     if (data.iloc_y(i) == 1) {count_pos_right++;}
                     if (data.iloc_y(i) == 0) {count_neg_right++;}
+                    right_index.push_back(i);
                 }
                 if (data.iloc_x(i, col) < v)
                 {
                     if (data.iloc_y(i) == 1) {count_pos_left++;}
                     if (data.iloc_y(i) == 0) {count_neg_left++;}
+                    left_index.push_back(i);
                 }
             }
             //Computing the resulting gini of the two nodes:
@@ -107,11 +116,37 @@ std::pair<int, int> DecisionTree::best_split(const DataSet& data) const{
                 best_w_gini = w_gini;
                 best_threshold = v;
                 split_feature = col;
+                top_right_index = right_index;
+                top_left_index = left_index;
+
                 }
         }
     }
 
     std::cout << "RESULTS" << std::endl << "Gini :" << best_w_gini << " | Best t : " << best_threshold << " | Split on col "<<split_feature << std::endl;
+
+    SplitResult split = SplitResult(split_feature, best_threshold, top_left_index, top_right_index);
+
+    return split;
+}
+
+void DecisionTree::build_tree(Node root_node, const DataSet& data) const{
+
+
+    SplitResult split = best_split(data);
+
+    int depth = 1;
+
+    if (depth >= max_depth){
+        return;
+    }
+
+
+
+
+
+
+
 
 
 
@@ -119,6 +154,7 @@ std::pair<int, int> DecisionTree::best_split(const DataSet& data) const{
 
 
 }
+
 
 }
 
