@@ -7,7 +7,6 @@
 #include <span>
 
 
-
 void print_vector(std::vector<float>& x){
 
     for (int i =0;i<x.size(); i++){
@@ -27,30 +26,24 @@ void print_vector_2(std::vector<float>& x){
 
 }
 
-
 int main()
 {
-
-
 
     std::vector<float> v{1,1,3,
                          1,1,6,
                          1,2,6,
-                         1,2,12};
+                         1,2,12,
+                         1,3,14,
+                         1,12,11};
 
-    std::vector<float> y{0,0,1,1};
+    std::vector<float> y{0,0,1,0,1,0};
 
     myforest::DataSet data(v, y, 4, 3);
 
     myforest::DecisionTree tree(3);
 
-    std::pair<int, int> results = tree.count(data.y());
+    myforest::Node root_node;
 
-
-    float gini_score = tree.gini_score(results.first, results.second);
-    std::cout << gini_score << std::endl;
-
-    tree.best_split(data);
-
-
+    tree.build_tree(root_node, data);
+    tree.print_tree(root_node, 0);
 }

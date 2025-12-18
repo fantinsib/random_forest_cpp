@@ -1,4 +1,5 @@
 #include "myforest/dataset.h"
+#include <iostream>
 
 
 namespace myforest{
@@ -26,6 +27,31 @@ std::span<const float> DataSet::row_y(int row) const {
     return sub;
 }
 
+
+DataSet DataSet::index_split(std::vector<int>& index) const {
+    // Returns a subsplit of the dataset object of the rows from the specified index
+
+    //vector index references nth row of the dataset
+    std::vector<float> X_results;
+    std::vector<float> y_results;
+
+
+
+    for (auto i : index){
+        for (int col = 0; col < n_cols_; col++){
+            std::cout<<iloc_x(i, col) << std::endl;
+            X_results.push_back(iloc_x(i, col));
+
+
+    }
+        y_results.push_back(iloc_y(i));
+    }
+
+    DataSet output(X_results, y_results, index.size(), n_cols_);
+    return output;
+}
+
+
 Table::Table(std::vector<float> x, int n_row, int n_col):
 
     X_(x),
@@ -33,12 +59,6 @@ Table::Table(std::vector<float> x, int n_row, int n_col):
     n_cols_(n_col)
 
 {}
-
-
-
-
-
-
 
 
 }

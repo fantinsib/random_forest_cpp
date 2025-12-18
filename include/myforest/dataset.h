@@ -15,11 +15,15 @@ public:
     const std::vector<float>& X() const {return X_;}
     const std::vector<float>& y() const {return y_;}
 
+    // iloc_X -> takes row & col, return the (i,j) element of the matrix
     float iloc_x(int row, int col) const {return X_[col +row*n_cols_];}
+    // iloc_y -> takes row, returns the jth element of the target vector
     float iloc_y(int row) const {return y_[row];}
 
     std::span<const float> row_X(int row) const;
     std::span<const float> row_y(int row) const;
+
+    DataSet index_split(std::vector<int>& index) const;
 
 
 private:

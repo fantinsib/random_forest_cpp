@@ -48,12 +48,12 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
     const int n_col = data.n_cols();
 
 
-
     float best_w_gini = 1;
     float best_threshold;
     int split_feature;
     std::vector<int> top_left_index;
     std::vector<int> top_right_index;
+    bool is_pure_gini = false;
 
     //iterating columns:
     for (int col = 0; col < n_col; col++){
@@ -90,7 +90,6 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
             std::vector<int> left_index;
             std::vector<int> right_index;
 
-
             for (int i = 0; i < n_row; i++){
                 if (data.iloc_x(i, col) >= v)
                 {
@@ -108,8 +107,11 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
             //Computing the resulting gini of the two nodes:
             float gini_left = gini_score(count_pos_left, count_neg_left);
             float gini_right = gini_score(count_pos_right, count_neg_right);
-            float w_gini = gini_left*(count_pos_left+count_neg_left)/n_row
-                           + gini_right*(count_pos_right+count_neg_right)/n_row;
+            float left_weight  = static_cast<float>(count_pos_left + count_neg_left) / static_cast<float>(n_row);
+            float right_weight = static_cast<float>(count_pos_right + count_neg_right) / static_cast<float>(n_row);
+
+            float w_gini = left_weight * gini_left + right_weight * gini_right;
+            bool is_pure_gini = false;
 
             //Is best split so far ?
             if (w_gini < best_w_gini){
@@ -118,46 +120,65 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
                 split_feature = col;
                 top_right_index = right_index;
                 top_left_index = left_index;
-
                 }
         }
     }
 
     std::cout << "RESULTS" << std::endl << "Gini :" << best_w_gini << " | Best t : " << best_threshold << " | Split on col "<<split_feature << std::endl;
 
-    SplitResult split = SplitResult(split_feature, best_threshold, top_left_index, top_right_index);
 
-    return split;
+    if (best_w_gini == 0) is_pure_gini = true;
+    else is_pure_gini = false;
+
+    return {split_feature, best_threshold, top_left_index, top_right_index, is_pure_gini};
 }
 
-void DecisionTree::build_tree(Node root_node, const DataSet& data) const{
-
+void DecisionTree::build_tree(myforest::Node& node, const DataSet& data) const {
 
     SplitResult split = best_split(data);
 
-    int depth = 1;
-
-    if (depth >= max_depth){
+    std::cout << "Is pure split : " << split.is_pure_gini << std::endl;
+    if (split.is_pure_gini) {
+        node.is_leaf = true;
+        return;
+    }
+    if (split.left_index.empty() || split.right_index.empty()) {
+        node.is_leaf = true;
         return;
     }
 
+    node.is_leaf = false;
+    node.feature_index = split.feature;
+    node.threshold = split.threshold;
 
+    DataSet left_data  = data.index_split(split.left_index);
+    DataSet right_data = data.index_split(split.right_index);
 
+    node.left_child  = std::make_unique<myforest::Node>();
+    node.right_child = std::make_unique<myforest::Node>();
 
+    node.left_child->rows  = split.left_index;
+    node.right_child->rows = split.right_index;
 
-
-
-
-
-
-
-
-
+    build_tree(*node.left_child, left_data);
+    build_tree(*node.right_child, right_data);
 }
 
 
-}
+void DecisionTree::print_tree(Node& node, int depth = 0){
 
+    std::cout << "Depth "<< depth << " : feature : " << node.feature_index << " | Threshold : " <<  node.threshold << std::endl;
+
+    if (!node.is_leaf){
+
+        if (node.left_child) print_tree(*node.left_child, depth+1);
+        if (node.right_child) print_tree(*node.right_child, depth+1);
+
+    }
+
+
+}
+}
 
 
 
