@@ -41,6 +41,7 @@ const std::vector<float> DecisionTree::thresholds(const std::vector<float>& X) c
 
 SplitResult DecisionTree::best_split(const DataSet& data) const{
 
+
     const std::vector<float>& x = data.X();
     const std::vector<float>& y = data.y();
 
@@ -79,6 +80,8 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
                 thresholds.push_back(t);
             }
     }
+
+        if (thresholds.empty()) continue;
 
     //Splitting the col for each of the thresholds:
         for (auto v : thresholds){
@@ -124,10 +127,10 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
         }
     }
 
-    std::cout << "RESULTS" << std::endl << "Gini :" << best_w_gini << " | Best t : " << best_threshold << " | Split on col "<<split_feature << std::endl;
+    std::cout << "SPLIT RESULTS" << std::endl << "Gini :" << best_w_gini << " | Best t : " << best_threshold << " | Split on col "<<split_feature << std::endl << std::endl;
 
 
-    if (best_w_gini == 0) is_pure_gini = true;
+    if (best_w_gini <= 1e-7f) is_pure_gini = true;
     else is_pure_gini = false;
 
     return {split_feature, best_threshold, top_left_index, top_right_index, is_pure_gini};
@@ -153,6 +156,14 @@ void DecisionTree::build_tree(myforest::Node& node, const DataSet& data) const {
 
     DataSet left_data  = data.index_split(split.left_index);
     DataSet right_data = data.index_split(split.right_index);
+
+    std::cout<< std::endl << std::endl << "LEFT NODE " << std::endl << std::endl;
+    left_data.print();
+
+    std::cout << std::endl << std::endl << "RIGHT NODE " << std::endl << std::endl;
+    right_data.print();
+
+
 
     node.left_child  = std::make_unique<myforest::Node>();
     node.right_child = std::make_unique<myforest::Node>();

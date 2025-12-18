@@ -25,6 +25,8 @@ public:
 
     DataSet index_split(std::vector<int>& index) const;
 
+    void print() const;
+
 
 private:
     std::vector<float> X_;

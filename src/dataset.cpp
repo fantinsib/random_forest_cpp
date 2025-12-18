@@ -35,11 +35,8 @@ DataSet DataSet::index_split(std::vector<int>& index) const {
     std::vector<float> X_results;
     std::vector<float> y_results;
 
-
-
     for (auto i : index){
         for (int col = 0; col < n_cols_; col++){
-            std::cout<<iloc_x(i, col) << std::endl;
             X_results.push_back(iloc_x(i, col));
 
 
@@ -51,14 +48,19 @@ DataSet DataSet::index_split(std::vector<int>& index) const {
     return output;
 }
 
+void DataSet::print() const {
 
-Table::Table(std::vector<float> x, int n_row, int n_col):
+    for (int r = 0; r < n_rows_; r++){
+        std::cout << "Sample " << r << " | Target : " << iloc_y(r) << std::endl;
+        for (int col = 0; col < n_cols_; col++){
 
-    X_(x),
-    n_rows_(n_row),
-    n_cols_(n_col)
+            std::cout << iloc_x(r, col) << ", ";
 
-{}
+        }
+        std::cout << std::endl;
+    }
 
-
-}
+    std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl;
+}}
