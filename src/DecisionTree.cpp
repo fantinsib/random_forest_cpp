@@ -7,8 +7,7 @@
 
 namespace myforest{
 DecisionTree::DecisionTree(int max_depth_):
-     max_depth(max_depth_),
-     num_features(4)
+     max_depth(max_depth_)
 {}
 
 
@@ -41,6 +40,8 @@ const std::vector<float> DecisionTree::thresholds(const std::vector<float>& X) c
 
 SplitResult DecisionTree::best_split(const DataSet& data) const{
 
+    std::pair<int, int> class_count = data.count_classes();
+
 
     const std::vector<float>& x = data.X();
     const std::vector<float>& y = data.y();
@@ -55,6 +56,9 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
     std::vector<int> top_left_index;
     std::vector<int> top_right_index;
     bool is_pure_gini = false;
+    float left_gini = -1;
+    float right_gini = -1;
+
 
     //iterating columns:
     for (int col = 0; col < n_col; col++){
@@ -123,36 +127,57 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
                 split_feature = col;
                 top_right_index = right_index;
                 top_left_index = left_index;
+                left_gini = gini_left;
+                right_gini= gini_right;
+
                 }
         }
     }
 
-    std::cout << "SPLIT RESULTS" << std::endl << "Gini :" << best_w_gini << " | Best t : " << best_threshold << " | Split on col "<<split_feature << std::endl << std::endl;
+    //std::cout << "SPLIT RESULTS" << std::endl << "Gini :" << best_w_gini << " | Best t : " << best_threshold << " | Feature "<< split_feature << " | Samples : " << y.size() << std::endl << std::endl;
 
 
-    if (best_w_gini <= 1e-7f) is_pure_gini = true;
+    if (best_w_gini <= 1e-7f){
+        is_pure_gini = true;
+
+    }
     else is_pure_gini = false;
 
-    return {split_feature, best_threshold, top_left_index, top_right_index, is_pure_gini};
+    return {split_feature, best_threshold, top_left_index, top_right_index, is_pure_gini, left_gini,right_gini};
 }
 
 void DecisionTree::build_tree(myforest::Node& node, const DataSet& data) const {
 
     SplitResult split = best_split(data);
+    std::pair<int, int> class_count = data.count_classes();
 
-    std::cout << "Is pure split : " << split.is_pure_gini << std::endl;
-    if (split.is_pure_gini) {
+    if (class_count.first == 0 || class_count.second == 0){
         node.is_leaf = true;
+        if (class_count.first >= class_count.second) node.predicted_class = 1;
+        if (class_count.first < class_count.second) node.predicted_class = 0;
+        node.feature_index = split.feature;
+        node.threshold = split.threshold;
         return;
     }
+
     if (split.left_index.empty() || split.right_index.empty()) {
         node.is_leaf = true;
+        if (class_count.first >= class_count.second) node.predicted_class = 1;
+        if (class_count.first < class_count.second) node.predicted_class = 0;
+        node.feature_index = split.feature;
+        node.threshold = split.threshold;
         return;
     }
 
     node.is_leaf = false;
     node.feature_index = split.feature;
     node.threshold = split.threshold;
+
+
+
+    if (class_count.first >= class_count.second) node.predicted_class = 1;
+    if (class_count.first < class_count.second) node.predicted_class = 0;
+
 
     DataSet left_data  = data.index_split(split.left_index);
     DataSet right_data = data.index_split(split.right_index);
@@ -163,8 +188,6 @@ void DecisionTree::build_tree(myforest::Node& node, const DataSet& data) const {
     std::cout << std::endl << std::endl << "RIGHT NODE " << std::endl << std::endl;
     right_data.print();
 
-
-
     node.left_child  = std::make_unique<myforest::Node>();
     node.right_child = std::make_unique<myforest::Node>();
 
@@ -174,7 +197,6 @@ void DecisionTree::build_tree(myforest::Node& node, const DataSet& data) const {
     build_tree(*node.left_child, left_data);
     build_tree(*node.right_child, right_data);
 }
-
 
 void DecisionTree::print_tree(Node& node, int depth = 0){
 
@@ -189,7 +211,40 @@ void DecisionTree::print_tree(Node& node, int depth = 0){
 
 
 }
+
+
+int DecisionTree::predict(Node& node, const std::vector<float>& s) const {
+
+    int feature = node.feature_index;
+    float threshold = node.threshold;
+
+    std::cout << "NODE : " << node.node_id << std::endl;
+    std::cout << "Feature : " << feature << std::endl;
+    std::cout << "T : " << threshold << std::endl;
+    std::cout << "Sample val :  " << s[feature] << std::endl;
+
+    if (node.is_leaf) return node.predicted_class;
+
+    if (s[feature] <= threshold){
+        if (node.left_child){
+            return predict(*node.left_child, s);
+        }
+        else return node.predicted_class;
+    }
+
+    if (s[feature]>threshold){
+
+        if (node.right_child){
+            return predict(*node.right_child, s);
+        }
+        else return node.predicted_class;
+
+    }
+
+    return -1;
 }
+}
+
 
 
 

@@ -29,6 +29,9 @@ std::span<const float> DataSet::row_y(int row) const {
 
 
 std::pair<int, int> DataSet::count_classes() const {
+    // Returns a std::pair with
+    // first -> the number of positive class in the dataset
+    // second -> the number of negative class in the dataset
 
     int pos_count = 0;
     int neg_count = 0;

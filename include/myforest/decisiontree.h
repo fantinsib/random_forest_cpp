@@ -14,6 +14,8 @@ struct SplitResult{
     std::vector<int> left_index;
     std::vector<int> right_index;
     bool is_pure_gini = false;
+    float left_gini;
+    float right_gini;
 
 };
 
@@ -29,6 +31,7 @@ public:
     const std::pair<int,int> count(const std::vector<float>& y) const;
     void build_tree(Node& node, const DataSet& data) const;
     void print_tree(Node& node, int depth);
+    int predict(Node& node, const std::vector<float>& s) const;
 
 //private:
 

@@ -11,10 +11,12 @@ public:
     int feature_index;
     float threshold;
     int predicted_class;
+
     bool is_leaf = true;
 
     int return_feature_index() const;
     float return_threshold() const;
+    int node_id = rand() % 1000 + 1;
 
     std::vector<int> rows;
 
