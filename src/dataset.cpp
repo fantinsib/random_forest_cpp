@@ -28,6 +28,20 @@ std::span<const float> DataSet::row_y(int row) const {
 }
 
 
+std::pair<int, int> DataSet::count_classes() const {
+
+    int pos_count = 0;
+    int neg_count = 0;
+
+    for (auto i : y_){
+
+        if (i==0) neg_count++;
+        if (i==1) pos_count++;
+    }
+
+    return {pos_count, neg_count};
+}
+
 DataSet DataSet::index_split(std::vector<int>& index) const {
     // Returns a subsplit of the dataset object of the rows from the specified index
 

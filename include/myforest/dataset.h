@@ -27,6 +27,8 @@ public:
 
     void print() const;
 
+    std::pair<int, int> count_classes() const;
+
 
 private:
     std::vector<float> X_;
