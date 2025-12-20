@@ -148,34 +148,39 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
     return {split_feature, best_threshold, top_left_index, top_right_index, is_pure_gini, left_gini,right_gini};
 }
 
-void DecisionTree::build_tree(myforest::Node& node, const DataSet& data) const {
+void DecisionTree::build_tree(myforest::Node& node, const DataSet& data, int depth) const {
 
     SplitResult split = best_split(data);
     std::pair<int, int> class_count = data.count_classes();
 
-    if (class_count.first == 0 || class_count.second == 0){
+    //lambda function to stop iteration :
+    auto end_branch= [&](){
         node.is_leaf = true;
         if (class_count.first >= class_count.second) node.predicted_class = 1;
         if (class_count.first < class_count.second) node.predicted_class = 0;
-        node.feature_index = split.feature;
-        node.threshold = split.threshold;
+        node.feature_index = -1;
+        node.threshold = 0.f;
+        return;
+    };
+
+    if (class_count.first == 0 || class_count.second == 0) {
+        end_branch();
         return;
     }
 
     if (split.left_index.empty() || split.right_index.empty()) {
-        node.is_leaf = true;
-        if (class_count.first >= class_count.second) node.predicted_class = 1;
-        if (class_count.first < class_count.second) node.predicted_class = 0;
-        node.feature_index = split.feature;
-        node.threshold = split.threshold;
+        end_branch();
+        return;
+    }
+
+    if (depth > max_depth){
+        end_branch();
         return;
     }
 
     node.is_leaf = false;
     node.feature_index = split.feature;
     node.threshold = split.threshold;
-
-
 
     if (class_count.first >= class_count.second) node.predicted_class = 1;
     if (class_count.first < class_count.second) node.predicted_class = 0;
@@ -190,8 +195,10 @@ void DecisionTree::build_tree(myforest::Node& node, const DataSet& data) const {
     node.left_child->rows  = split.left_index;
     node.right_child->rows = split.right_index;
 
-    build_tree(*node.left_child, left_data);
-    build_tree(*node.right_child, right_data);
+
+    build_tree(*node.left_child, left_data, depth+1);
+    build_tree(*node.right_child, right_data, depth+1);
+
 }
 
 void DecisionTree::print_tree(Node& node, int depth = 0){
@@ -232,7 +239,8 @@ int DecisionTree::iterate_tree(Node& node, const std::vector<float>& s) const {
 
 void DecisionTree::fit(const DataSet& data){
 
-    build_tree(root_node, data);
+    int depth = 0;
+    build_tree(root_node, data, depth);
 
 }
 
