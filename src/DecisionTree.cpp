@@ -8,7 +8,10 @@
 namespace myforest{
 DecisionTree::DecisionTree(int max_depth_):
      max_depth(max_depth_)
-{}
+{
+    Node root_node;
+
+}
 
 
 float DecisionTree::gini_score(int pos_score, int neg_score) const{
@@ -199,12 +202,9 @@ void DecisionTree::print_tree(Node& node, int depth = 0){
         if (node.right_child) print_tree(*node.right_child, depth+1);
 
     }
-
-
 }
 
-
-int DecisionTree::predict(Node& node, const std::vector<float>& s) const {
+int DecisionTree::iterate_tree(Node& node, const std::vector<float>& s) const {
 
     int feature = node.feature_index;
     float threshold = node.threshold;
@@ -213,7 +213,7 @@ int DecisionTree::predict(Node& node, const std::vector<float>& s) const {
 
     if (s[feature] <= threshold){
         if (node.left_child){
-            return predict(*node.left_child, s);
+            return iterate_tree(*node.left_child, s);
         }
         else return node.predicted_class;
     }
@@ -221,7 +221,7 @@ int DecisionTree::predict(Node& node, const std::vector<float>& s) const {
     if (s[feature]>threshold){
 
         if (node.right_child){
-            return predict(*node.right_child, s);
+            return iterate_tree(*node.right_child, s);
         }
         else return node.predicted_class;
 
@@ -229,9 +229,20 @@ int DecisionTree::predict(Node& node, const std::vector<float>& s) const {
 
     return -1;
 }
+
+void DecisionTree::fit(const DataSet& data){
+
+    build_tree(root_node, data);
+
 }
 
+int DecisionTree::predict(const std::vector<float>& s){
 
+    return iterate_tree(root_node, s);
+
+}
+
+}
 
 
 
