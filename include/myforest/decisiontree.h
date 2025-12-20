@@ -1,6 +1,7 @@
 #ifndef DECISIONTREE_H
 #define DECISIONTREE_H
 #include <iostream>
+#include <iomanip>
 #include <myforest/dataset.h>
 #include <myforest/node.h>
 
@@ -33,7 +34,7 @@ public:
 
     //Functions
     void fit(const DataSet& data);
-    void print_tree(Node& node, int depth);
+    void print_tree() const;
     int predict(const std::vector<float>& s);
 
 
@@ -45,7 +46,7 @@ private:
     void build_tree(Node& node, const DataSet& data, int depth) const; //recursion called by .fit()
     float gini_score(int pos_score, int neg_score) const; //computes Gini for a node given the number of pos classes and number of neg classes
     const std::pair<int,int> count(const std::vector<float>& y) const; //counts the number of positive & negative classes in a y vector
-
+    void print_tree_rec(const Node& node, const std::string& prefix, bool is_left, bool is_last) const;
 };
 }
 #endif // DECISIONTREE_H

@@ -201,14 +201,62 @@ void DecisionTree::build_tree(myforest::Node& node, const DataSet& data, int dep
 
 }
 
-void DecisionTree::print_tree(Node& node, int depth = 0){
+void DecisionTree::print_tree_rec(
+    const Node& node,
+    const std::string& prefix,
+    bool is_left,
+    bool is_last
+    ) const {
+    // branche + label
+    std::cout << prefix
+              << (is_last ? "└── " : "├── ")
+              << (is_left ? "yes: " : "no:  ");
 
-    if (!node.is_leaf){
-
-        if (node.left_child) print_tree(*node.left_child, depth+1);
-        if (node.right_child) print_tree(*node.right_child, depth+1);
-
+    if (node.is_leaf) {
+        std::cout << "Leaf(id=" << node.node_id
+                  << ") → class=" << node.predicted_class << '\n';
+        return;
     }
+
+    std::cout << "Node(id=" << node.node_id
+              << ") x[" << node.feature_index << "] <= "
+              << std::fixed << std::setprecision(4) << node.threshold
+              << '\n';
+
+    // Préfixe pour les enfants : si ce noeud n'est pas "dernier", on garde le trait vertical
+    const std::string child_prefix = prefix + (is_last ? "    " : "│   ");
+
+    const bool has_left  = (node.left_child  != nullptr);
+    const bool has_right = (node.right_child != nullptr);
+
+    // Pour décider du "last", on regarde si l'autre enfant existe
+    if (has_left) {
+        const bool left_is_last = !has_right;                 // s'il n'y a pas de right, left est le dernier
+        print_tree_rec(*node.left_child, child_prefix, true, left_is_last);
+    }
+    if (has_right) {
+        print_tree_rec(*node.right_child, child_prefix, false, true); // right est le dernier (quand il existe)
+    }
+}
+
+void DecisionTree::print_tree() const {
+    // Racine
+    if (root_node.is_leaf) {
+        std::cout << "Leaf(id=" << root_node.node_id
+                  << ") → class=" << root_node.predicted_class << '\n';
+        return;
+    }
+
+    std::cout << "Node(id=" << root_node.node_id
+              << ") x[" << root_node.feature_index << "] <= "
+              << std::fixed << std::setprecision(4) << root_node.threshold
+              << '\n';
+
+    // Enfants : ici on force un préfixe de base non vide
+    if (root_node.left_child)
+        print_tree_rec(*root_node.left_child, "", true,  true);   // is_left, is_last
+    if (root_node.right_child)
+        print_tree_rec(*root_node.right_child, "", false, true);
 }
 
 int DecisionTree::iterate_tree(Node& node, const std::vector<float>& s) const {
