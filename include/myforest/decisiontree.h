@@ -2,6 +2,8 @@
 #define DECISIONTREE_H
 #include <iostream>
 #include <iomanip>
+#include <stdexcept>
+
 #include <myforest/dataset.h>
 #include <myforest/node.h>
 
@@ -35,7 +37,7 @@ public:
     //Functions
     void fit(const DataSet& data);
     void print_tree() const;
-    int predict(const std::vector<float>& s);
+    std::vector<int> predict(const std::vector<float>& s);
 
 
 private:

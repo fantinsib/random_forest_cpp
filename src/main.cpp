@@ -6,6 +6,17 @@
 #include <vector>
 #include <span>
 
+void print_vector(const std::vector<int> v){
+
+    for (auto i : v){
+
+        std::cout << i << ", ";
+    }
+        std::cout << std::endl;
+
+
+}
+
 
 int main()
 {
@@ -22,9 +33,13 @@ int main()
     myforest::DecisionTree tree(2);
     tree.fit(data);
 
-    std::vector<float> new_sample{12,33,55};
-    int pred = tree.predict(new_sample);
-    std::cout << "PREDICTED : " << pred << std::endl;
+    std::vector<float> new_sample{1,1,3,
+                                  1,1,6,
+                                  3,3,1};
+
+    std::vector<int> pred = tree.predict(new_sample);
+    std::cout << "PREDICTED : " << std::endl;
+    print_vector(pred);
     tree.print_tree();
 
 }

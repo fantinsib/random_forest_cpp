@@ -148,6 +148,14 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
     return {split_feature, best_threshold, top_left_index, top_right_index, is_pure_gini, left_gini,right_gini};
 }
 
+void DecisionTree::fit(const DataSet& data){
+
+    int depth = 0;
+    num_features = data.n_cols();
+    build_tree(root_node, data, depth);
+
+}
+
 void DecisionTree::build_tree(myforest::Node& node, const DataSet& data, int depth) const {
 
     SplitResult split = best_split(data);
@@ -201,12 +209,7 @@ void DecisionTree::build_tree(myforest::Node& node, const DataSet& data, int dep
 
 }
 
-void DecisionTree::print_tree_rec(
-    const Node& node,
-    const std::string& prefix,
-    bool is_left,
-    bool is_last
-    ) const {
+void DecisionTree::print_tree_rec(const Node& node,const std::string& prefix,bool is_left,bool is_last) const {
     // branche + label
     std::cout << prefix
               << (is_last ? "└── " : "├── ")
@@ -261,6 +264,7 @@ void DecisionTree::print_tree() const {
 
 int DecisionTree::iterate_tree(Node& node, const std::vector<float>& s) const {
 
+
     int feature = node.feature_index;
     float threshold = node.threshold;
 
@@ -285,16 +289,27 @@ int DecisionTree::iterate_tree(Node& node, const std::vector<float>& s) const {
     return -1;
 }
 
-void DecisionTree::fit(const DataSet& data){
 
-    int depth = 0;
-    build_tree(root_node, data, depth);
+std::vector<int> DecisionTree::predict(const std::vector<float>& s){
 
-}
+    if (s.size() % num_features != 0) throw std::runtime_error("Sample does not have the correct size");
 
-int DecisionTree::predict(const std::vector<float>& s){
+    int num_samples = s.size()/num_features;
 
-    return iterate_tree(root_node, s);
+    std::vector<int> pred;
+    std::vector<float> sample;
+    for (int i = 0; i<num_samples; i++){
+
+
+        for (int j = 0; j < num_features; j++ ){
+            sample.push_back(s[i*num_features + j]);
+        }
+
+        pred.push_back((iterate_tree(root_node, sample)));
+        sample.clear();
+    }
+
+    return pred;
 
 }
 
