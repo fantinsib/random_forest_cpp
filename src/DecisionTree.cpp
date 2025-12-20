@@ -29,27 +29,46 @@ const std::pair<int, int> DecisionTree::count(const std::vector<float>& y) const
     return {count_positive, count_negative};
 }
 
-const std::vector<float> DecisionTree::thresholds(const std::vector<float>& X) const{
+const std::vector<float> DecisionTree::get_thresholds(const DataSet& data, int t_col) const{
 
+    //Takes a reference to the dataset and returns the threshold vector
+    // for the specified col
 
+    int n_row = data.n_rows();
+    std::vector<float> sorted_col(n_row);
+    for (int i =0; i<n_row; i++)
+    {
+        sorted_col[i] = data.iloc_x(i, t_col);
+    }
+    // sorting:
+    std::sort(sorted_col.begin(), sorted_col.end());
+    //computing & storing the thresholds in a vector:
+    std::vector<float> thresholds;
+    for (int row = 1; row < n_row; row++){
 
+        float a = sorted_col[row-1];
+        float b = sorted_col[row];
 
+        if (a!=b) {
+            float t = (a+b)*0.5;
+            thresholds.push_back(t);
+        }
+    }
 
+    return thresholds;
 
 }
 
 SplitResult DecisionTree::best_split(const DataSet& data) const{
 
-    std::pair<int, int> class_count = data.count_classes();
-
-
+    //get data from the dataset object
     const std::vector<float>& x = data.X();
     const std::vector<float>& y = data.y();
 
     const int n_row = data.n_rows();
     const int n_col = data.n_cols();
 
-
+    //definition of variables
     float best_w_gini = 1;
     float best_threshold;
     int split_feature;
@@ -60,34 +79,16 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
     float right_gini = -1;
 
 
-    //iterating columns:
-    for (int col = 0; col < n_col; col++){
+    for (int col = 0; col < n_col; col++){ //for each column:
 
-        //Preparing the thresholds :
-        //Getting the col values
-        std::vector<float> sorted_col(n_row);
-        for (int i =0; i<n_row; i++)
-        {
-            sorted_col[i] = data.iloc_x(i, col);
-        }
-        // sorting:
-        std::sort(sorted_col.begin(), sorted_col.end());
-        //computing & storing the thresholds in a vector:
-        std::vector<float> thresholds;
-        for (int row = 1; row < n_row; row++){
-
-            float a = sorted_col[row-1];
-            float b = sorted_col[row];
-
-            if (a!=b) {
-                float t = (a+b)*0.5;
-                thresholds.push_back(t);
-            }
-    }
-
+        std::vector<float> thresholds = get_thresholds(data, col); //fetch the thresholds of the col
         if (thresholds.empty()) continue;
 
-    //Splitting the col for each of the thresholds:
+    //for each of the threshold, iterate in the corresponding col
+    // if the sample feature is superior or equal to the threshold -> counted in
+    // the right node, left otherwise. Code computes the number of positive and negative
+    // classes that end up in each node + the index of the left/right values
+
         for (auto v : thresholds){
             int count_pos_left= 0;
             int count_pos_right=0;
@@ -133,8 +134,6 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
                 }
         }
     }
-
-    //std::cout << "SPLIT RESULTS" << std::endl << "Gini :" << best_w_gini << " | Best t : " << best_threshold << " | Feature "<< split_feature << " | Samples : " << y.size() << std::endl << std::endl;
 
 
     if (best_w_gini <= 1e-7f){
@@ -182,12 +181,6 @@ void DecisionTree::build_tree(myforest::Node& node, const DataSet& data) const {
     DataSet left_data  = data.index_split(split.left_index);
     DataSet right_data = data.index_split(split.right_index);
 
-    std::cout<< std::endl << std::endl << "LEFT NODE " << std::endl << std::endl;
-    left_data.print();
-
-    std::cout << std::endl << std::endl << "RIGHT NODE " << std::endl << std::endl;
-    right_data.print();
-
     node.left_child  = std::make_unique<myforest::Node>();
     node.right_child = std::make_unique<myforest::Node>();
 
@@ -199,8 +192,6 @@ void DecisionTree::build_tree(myforest::Node& node, const DataSet& data) const {
 }
 
 void DecisionTree::print_tree(Node& node, int depth = 0){
-
-    std::cout << "Depth "<< depth << " : feature : " << node.feature_index << " | Threshold : " <<  node.threshold << std::endl;
 
     if (!node.is_leaf){
 
@@ -217,11 +208,6 @@ int DecisionTree::predict(Node& node, const std::vector<float>& s) const {
 
     int feature = node.feature_index;
     float threshold = node.threshold;
-
-    std::cout << "NODE : " << node.node_id << std::endl;
-    std::cout << "Feature : " << feature << std::endl;
-    std::cout << "T : " << threshold << std::endl;
-    std::cout << "Sample val :  " << s[feature] << std::endl;
 
     if (node.is_leaf) return node.predicted_class;
 

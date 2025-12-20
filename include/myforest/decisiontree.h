@@ -33,14 +33,10 @@ public:
     void print_tree(Node& node, int depth);
     int predict(Node& node, const std::vector<float>& s) const;
 
-//private:
+private:
 
     SplitResult best_split(const DataSet& data) const;
-    const std::vector<float> thresholds(const std::vector<float>& X) const;
-
-
-
-
+    const std::vector<float> get_thresholds(const DataSet& data, int t_col) const;
 
 };
 }
