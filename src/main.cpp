@@ -6,6 +6,19 @@
 #include <vector>
 #include <span>
 
+
+/*
+ *
+ * This project aims at implementing
+ * a random forest engine in C++ with
+ * a Python binding for easier use.
+ *
+ * v.1 will be limited to binary
+ * classification for now (targets -> {0,1})
+ *
+ */
+
+
 void print_vector(const std::vector<int> v){
 
     for (auto i : v){
@@ -13,29 +26,37 @@ void print_vector(const std::vector<int> v){
         std::cout << i << ", ";
     }
         std::cout << std::endl;
-
-
 }
-
 
 int main()
 {
-    std::vector<float> v{1,1,3,
-                         1,1,6,
-                         2,2,6,
-                         1,2,2,
-                         3,3,1,
-                         5,3,2};
+    std::vector<float> f{1,1,3,5,
+                         1,1,6,3,
+                         2,2,6,4,
+                         1,2,2,9,
+                         3,3,1,13,
+                         5,3,2,20};
 
-    std::vector<float> y{1,0,0,0,1,1};
+    std::vector<float> v{6, 3, 7, 4,
+                        6, 9, 2, 6,
+                        7, 4, 3, 7,
+                        7, 2, 5, 4,
+                        1, 7, 5, 1,
+                        4, 0, 9, 5,
+                        8, 0, 9, 2,
+                        6, 3, 8, 2,
+                        4, 2, 6, 4,
+                        8, 6, 1, 3};
 
-    myforest::DataSet data(v, y, 6, 3);
-    myforest::DecisionTree tree(2);
+    std::vector<float> y{1,0,0,0,1,1,1,0,0,1};
+
+    myforest::DataSet data(v, y, 10, 4);
+    myforest::DecisionTree tree(100);
     tree.fit(data);
 
-    std::vector<float> new_sample{1,1,3,
-                                  1,1,6,
-                                  3,3,1};
+    std::vector<float> new_sample{1,1,6,3.1,
+                                  1.1,2,2,8.9,
+                                  4.5, 4, 2.1, 30};
 
     std::vector<int> pred = tree.predict(new_sample);
     std::cout << "PREDICTED : " << std::endl;

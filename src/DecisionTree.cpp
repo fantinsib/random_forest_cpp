@@ -9,10 +9,7 @@ namespace myforest{
 DecisionTree::DecisionTree(int max_depth_):
      max_depth(max_depth_)
 {
-    Node root_node;
-
-}
-
+    Node root_node;}
 
 float DecisionTree::gini_score(int pos_score, int neg_score) const{
     float total = pos_score+neg_score;
@@ -63,6 +60,11 @@ const std::vector<float> DecisionTree::get_thresholds(const DataSet& data, int t
 }
 
 SplitResult DecisionTree::best_split(const DataSet& data) const{
+    /*
+    Takes as input a dataset and returns a SplitResult struct containing
+    the best split based on Gini
+    */
+
 
     //get data from the dataset object
     const std::vector<float>& x = data.X();
@@ -181,7 +183,7 @@ void DecisionTree::build_tree(myforest::Node& node, const DataSet& data, int dep
         return;
     }
 
-    if (depth > max_depth){
+    if (depth >= max_depth){
         end_branch();
         return;
     }
@@ -270,14 +272,14 @@ int DecisionTree::iterate_tree(Node& node, const std::vector<float>& s) const {
 
     if (node.is_leaf) return node.predicted_class;
 
-    if (s[feature] <= threshold){
+    if (s[feature] < threshold){
         if (node.left_child){
             return iterate_tree(*node.left_child, s);
         }
         else return node.predicted_class;
     }
 
-    if (s[feature]>threshold){
+    if (s[feature]>=threshold){
 
         if (node.right_child){
             return iterate_tree(*node.right_child, s);
@@ -288,7 +290,6 @@ int DecisionTree::iterate_tree(Node& node, const std::vector<float>& s) const {
 
     return -1;
 }
-
 
 std::vector<int> DecisionTree::predict(const std::vector<float>& s){
 

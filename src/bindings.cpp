@@ -3,9 +3,8 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(treelib, m) {
+PYBIND11_MODULE(_treelib, m) {
     m.doc() = "C++ Decision Tree / Random Forest library";
-    m.doc() = "myforest bindings";
     m.def("ping", [](){ return "pong"; });
 
     m.def("echo_int", [](int x) { return x; }, "Return the same integer");
