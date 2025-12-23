@@ -65,7 +65,6 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
     the best split based on Gini
     */
 
-
     //get data from the dataset object
     const std::vector<float>& x = data.X();
     const std::vector<float>& y = data.y();
@@ -82,6 +81,7 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
     bool is_pure_gini = false;
     float left_gini = -1;
     float right_gini = -1;
+    bool found_a_split = false; 
 
 
     for (int col = 0; col < n_col; col++){ //for each column:
@@ -95,6 +95,7 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
     // classes that end up in each node + the index of the left/right values
 
         for (auto v : thresholds){
+            found_a_split = true;
             int count_pos_left= 0;
             int count_pos_right=0;
             int count_neg_left=0;
@@ -147,7 +148,7 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
     }
     else is_pure_gini = false;
 
-    return {split_feature, best_threshold, top_left_index, top_right_index, is_pure_gini, left_gini,right_gini};
+    return {split_feature, best_threshold, top_left_index, top_right_index, is_pure_gini, left_gini,right_gini, found_a_split};
 }
 
 void DecisionTree::fit(const DataSet& data){
@@ -155,6 +156,7 @@ void DecisionTree::fit(const DataSet& data){
     int depth = 0;
     num_features = data.n_cols();
     build_tree(root_node, data, depth);
+    fitted = true;
 
 }
 
@@ -172,6 +174,11 @@ void DecisionTree::build_tree(myforest::Node& node, const DataSet& data, int dep
         node.threshold = 0.f;
         return;
     };
+
+    if (split.found_a_split == false) {
+        end_branch();
+        return;
+    }
 
     if (class_count.first == 0 || class_count.second == 0) {
         end_branch();
@@ -293,6 +300,7 @@ int DecisionTree::iterate_tree(Node& node, const std::vector<float>& s) const {
 
 std::vector<int> DecisionTree::predict(const std::vector<float>& s){
 
+    if (fitted != true) throw std::runtime_error("Tree was not fitted.");
     if (s.size() % num_features != 0) throw std::runtime_error("Sample does not have the correct size");
 
     int num_samples = s.size()/num_features;

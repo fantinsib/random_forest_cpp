@@ -19,6 +19,7 @@ struct SplitResult{
     bool is_pure_gini = false;
     float left_gini;
     float right_gini;
+    bool found_a_split;
 
 };
 
@@ -33,6 +34,7 @@ public:
     int max_depth;
     int num_features;
     Node root_node;
+    bool fitted = false; 
 
     //Functions
     void fit(const DataSet& data);
