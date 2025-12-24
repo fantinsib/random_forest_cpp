@@ -1,6 +1,7 @@
 #ifndef RANDOMFOREST_H
 #define RANDOMFOREST_H
 #include "dataset.h"
+#include <optional> 
 
 namespace myforest{
 
@@ -8,7 +9,7 @@ class RandomForest
 {
 public:
     RandomForest();
-    int seed_;
+    std::optional<int> seed_;
     DataSet random_samples(DataSet& v, float size = 0.6);
     void set_seed(int seed);
 };
