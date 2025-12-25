@@ -9,8 +9,10 @@ DataSet::DataSet(std::vector<float> X, std::vector<float> Y, int n_rows, int n_c
     y_(Y),
     n_rows_(n_rows),
     n_cols_(n_cols)
-
-{}
+{
+    if (n_cols_*n_rows_ != X_.size()) throw std::invalid_argument("The specified number of rows and columns does not match the number of samples.");
+    if (n_rows_ != y_.size()) throw std::invalid_argument("The size of y does not match the number of samples.");
+}
 
 std::span<const float> DataSet::row_X(int row) const {
 

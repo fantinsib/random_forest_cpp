@@ -58,7 +58,7 @@ int main()
 
     myforest::DataSet data(v, y, 10, 4);
     
-    myforest::RandomForest rf(10, 3);
+    myforest::RandomForest rf(100, 3);
     
     rf.fit(data);
 

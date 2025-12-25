@@ -168,9 +168,10 @@ SplitResult DecisionTree::best_split(const DataSet& data, bool in_rf, int m_try)
 
 void DecisionTree::fit(const DataSet& data, bool in_rf, int m_try){
 
+    num_features = data.n_cols();
+    if (num_features <= 0)  throw std::runtime_error("Error : num_features is null or non valid");
     if (m_try < 0) m_try = num_features;
     int depth = 0;
-    num_features = data.n_cols();
     build_tree(root_node, data, depth, in_rf, m_try);
     fitted = true;
 
