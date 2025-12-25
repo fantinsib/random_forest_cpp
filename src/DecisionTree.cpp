@@ -58,9 +58,7 @@ const std::vector<float> DecisionTree::get_thresholds(const DataSet& data, int t
             thresholds.push_back(t);
         }
     }
-
     return thresholds;
-    
 }
 
 SplitResult DecisionTree::best_split(const DataSet& data, bool in_rf, int m_try) const{
