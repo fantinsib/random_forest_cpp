@@ -6,7 +6,10 @@
 
 namespace myforest{
 
-RandomForest::RandomForest() {}
+RandomForest::RandomForest(int n_trees_, int m_try_) :
+    m_try(m_try_),
+    n_trees(n_trees_)
+{}
 
 DataSet RandomForest::random_samples(DataSet& v, float size){
     /*
@@ -32,15 +35,27 @@ DataSet RandomForest::random_samples(DataSet& v, float size){
     return v.index_split(index_num);
 }
 
-
-
-
-
 void RandomForest::set_seed(int seed){
 
     if (seed < 0) throw std::runtime_error ("Seed value can't be negative.");
     this->seed_ = seed;
 }
+
+void RandomForest::fit(DataSet& v){
+
+    trees_.clear();
+
+    for (int i = 0; i < n_trees; i++){
+
+        DecisionTree t = DecisionTree(3);
+        DataSet subset = random_samples(v);
+        t.fit(subset, true, m_try);
+        trees_.push_back(std::move(t));
+        
+    }
+
+}
+
 
 }
 

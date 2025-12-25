@@ -1,6 +1,7 @@
 #include <myforest/node.h>
 #include "myforest/dataset.h"
 #include "myforest/decisiontree.h"
+#include "myforest/randomforest.h"
 
 #include <iostream>
 #include <vector>
@@ -14,8 +15,8 @@
  * a random forest engine in C++ with
  * a Python binding for easier use.
  *
- * v.1 will be limited to binary
- * classification for now (targets -> {0,1})
+ * Limited to binary classification
+ * for now (targets -> {0,1})
  *
  */
 
@@ -32,7 +33,6 @@ void print_vector(const std::vector<int> v){
 int main()
 {
 
-    /*
     std::vector<float> f{1,1,3,5,
                          1,1,6,3,
                          2,2,6,4,
@@ -54,24 +54,9 @@ int main()
     std::vector<float> y{1,0,0,0,1,1,1,0,0,1};
 
     myforest::DataSet data(v, y, 10, 4);
-    myforest::DecisionTree tree(100);
-    tree.fit(data);
-
-    std::vector<float> new_sample{1,1,6,3.1,
-                                  1.1,2,2,8.9,
-                                  4.5, 4, 2.1, 30};
-
-    std::vector<int> pred = tree.predict(new_sample);
-    std::cout << "PREDICTED : " << std::endl;
-    print_vector(pred);
-    tree.print_tree();
-
-    */
-
-
-    std::mt19937 rng(43);
-    std::uniform_int_distribution<int> dist(0,9);
-    int x = dist(rng);
-    std::cout << x<< std::endl;
+    
+    myforest::RandomForest rf(10, 2);
+    
+    rf.fit(data);
 
 }
