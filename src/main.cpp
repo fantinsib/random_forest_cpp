@@ -51,12 +51,21 @@ int main()
                         4, 2, 6, 4,
                         8, 6, 1, 3};
 
+
     std::vector<float> y{1,0,0,0,1,1,1,0,0,1};
+
+    std::vector<float> x2{8,6,1,3};
 
     myforest::DataSet data(v, y, 10, 4);
     
-    myforest::RandomForest rf(10, 2);
+    myforest::RandomForest rf(10, 3);
     
     rf.fit(data);
+
+    float pred = rf.single_predict(x2);
+
+    std::cout << pred << std::endl;
+
+    // statement vide
 
 }

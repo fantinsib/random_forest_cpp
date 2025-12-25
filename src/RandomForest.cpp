@@ -56,6 +56,25 @@ void RandomForest::fit(DataSet& v){
 
 }
 
+float RandomForest::single_predict(std::vector<float>& x){
+
+    int pos_count=0;
+    int neg_count=0;
+
+    for (auto& t : trees_){
+        
+        std::vector<int> t_pred = t.predict(x);
+        (t_pred[0] == 1) ? pos_count++ : neg_count++;
+
+    }
+
+    float pct_predicted = (pos_count/static_cast<float>(pos_count+neg_count));
+
+    return pct_predicted;
+
+}
+
+
 
 }
 

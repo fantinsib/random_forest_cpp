@@ -18,6 +18,8 @@ public:
     void set_seed(int seed);
     void fit(DataSet& v);
 
+    float single_predict(std::vector<float>& x);
+
 private:
 
     std::vector<DecisionTree> trees_;
