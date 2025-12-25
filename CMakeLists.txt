@@ -21,6 +21,7 @@ add_library(myforest
   src/RandomForest.cpp
   src/node.cpp
   src/dataset.cpp
+  src/helpers.cpp
 )
 
 target_include_directories(myforest PUBLIC

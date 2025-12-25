@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <span>
+#include <random>
 
 
 /*
@@ -30,6 +31,8 @@ void print_vector(const std::vector<int> v){
 
 int main()
 {
+
+    /*
     std::vector<float> f{1,1,3,5,
                          1,1,6,3,
                          2,2,6,4,
@@ -62,5 +65,13 @@ int main()
     std::cout << "PREDICTED : " << std::endl;
     print_vector(pred);
     tree.print_tree();
+
+    */
+
+
+    std::mt19937 rng(43);
+    std::uniform_int_distribution<int> dist(0,9);
+    int x = dist(rng);
+    std::cout << x<< std::endl;
 
 }

@@ -1,8 +1,12 @@
 #include "myforest/decisiontree.h"
 #include "myforest/dataset.h"
 #include "myforest/node.h"
+#include "myforest/helpers.h"
 #include <span>
 #include <algorithm>
+#include <random>
+#include <numeric>
+
 
 
 namespace myforest{
@@ -59,7 +63,7 @@ const std::vector<float> DecisionTree::get_thresholds(const DataSet& data, int t
     
 }
 
-SplitResult DecisionTree::best_split(const DataSet& data) const{
+SplitResult DecisionTree::best_split(const DataSet& data, bool in_rf, int m_try) const{
     /*
     Takes as input a dataset and returns a SplitResult struct containing
     the best split based on Gini
@@ -81,10 +85,24 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
     bool is_pure_gini = false;
     float left_gini = -1;
     float right_gini = -1;
-    bool found_a_split = false; 
+    bool found_a_split = false;
 
+    // If best_split is called in the context of a RandomForest,
+    // the features are selected based on m_try :
 
-    for (int col = 0; col < n_col; col++){ //for each column:
+    std::vector<int> col_number;
+    
+    if (in_rf){
+
+        col_number = sample_features(num_features, m_try);
+    }
+
+    else{
+        col_number.resize(num_features);
+        std::iota(col_number.begin(), col_number.end(), 0);
+    }
+
+    for (int col : col_number){ //for each column:
 
         std::vector<float> thresholds = get_thresholds(data, col); //fetch the thresholds of the col
         if (thresholds.empty()) continue;
@@ -141,28 +159,28 @@ SplitResult DecisionTree::best_split(const DataSet& data) const{
         }
     }
 
-
     if (best_w_gini <= 1e-7f){
         is_pure_gini = true;
-
     }
+
     else is_pure_gini = false;
 
     return {split_feature, best_threshold, top_left_index, top_right_index, is_pure_gini, left_gini,right_gini, found_a_split};
 }
 
-void DecisionTree::fit(const DataSet& data){
+void DecisionTree::fit(const DataSet& data, bool in_rf, int m_try){
 
+    if (m_try < 0) m_try = num_features;
     int depth = 0;
     num_features = data.n_cols();
-    build_tree(root_node, data, depth);
+    build_tree(root_node, data, depth, in_rf, m_try);
     fitted = true;
 
 }
 
-void DecisionTree::build_tree(myforest::Node& node, const DataSet& data, int depth) const {
+void DecisionTree::build_tree(myforest::Node& node, const DataSet& data, int depth, bool in_rf, int m_try) const {
 
-    SplitResult split = best_split(data);
+    SplitResult split = best_split(data, in_rf, m_try);
     std::pair<int, int> class_count = data.count_classes();
 
     //lambda function to stop iteration :
@@ -213,8 +231,8 @@ void DecisionTree::build_tree(myforest::Node& node, const DataSet& data, int dep
     node.right_child->rows = split.right_index;
 
 
-    build_tree(*node.left_child, left_data, depth+1);
-    build_tree(*node.right_child, right_data, depth+1);
+    build_tree(*node.left_child, left_data, depth+1, in_rf, m_try);
+    build_tree(*node.right_child, right_data, depth+1, in_rf, m_try);
 
 }
 

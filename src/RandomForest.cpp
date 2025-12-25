@@ -1,4 +1,5 @@
 #include "myforest/randomforest.h"
+#include "myforest/decisiontree.h"
 #include <random>
 #include <cmath>
 
@@ -30,6 +31,8 @@ DataSet RandomForest::random_samples(DataSet& v, float size){
 
     return v.index_split(index_num);
 }
+
+
 
 
 
