@@ -2,6 +2,7 @@
 #include "myforest/decisiontree.h"
 #include <random>
 #include <cmath>
+#include <numeric>
 
 
 namespace myforest{
@@ -9,6 +10,7 @@ namespace myforest{
 RandomForest::RandomForest(int n_trees_, int m_try_) :
     m_try(m_try_),
     n_trees(n_trees_)
+    
 {}
 
 DataSet RandomForest::random_samples(DataSet& v, float size){
@@ -54,10 +56,16 @@ void RandomForest::fit(DataSet& v){
         
     }
 
+    is_fitted = true;
+    num_features = v.n_cols();
+
 }
 
 float RandomForest::single_predict(std::vector<float>& x){
 
+    if (is_fitted != true) throw std::runtime_error(".single_predict() called but RandomForest was never fitted!");
+    if (x.size()%num_features != 0) throw std::runtime_error("Number of features in sample does not match number of features from training.");
+    
     int pos_count=0;
     int neg_count=0;
 
@@ -74,7 +82,39 @@ float RandomForest::single_predict(std::vector<float>& x){
 
 }
 
+std::vector<int> RandomForest::predict(std::vector<float>& x){
 
+    if (is_fitted != true) throw std::runtime_error(".predict() called but RandomForest was never fitted!");
+    if (x.size()%num_features != 0) throw std::runtime_error("Number of features in sample does not match number of features from training.");
 
+    int num_samples = x.size()/num_features;
+
+    std::vector<int> pred(num_samples);
+    std::vector<float> sample(num_features);
+
+    //Iterating to separate each sample :
+    for (int i = 0; i<num_samples; i++){
+        for (int j = 0; j < num_features; j++ ){
+            sample[j]= (x[i*num_features + j]);
+        }
+
+        // We now have a complete sample in sample; 
+
+        int pos_count=0;
+        int neg_count=0;
+
+        for (auto& t : trees_){
+    
+            std::vector<int> t_pred = t.predict(sample);
+            if (t_pred[0] ==0) neg_count++;
+            if (t_pred[0] ==1) pos_count++;
+
+        }
+        (pos_count >= neg_count) ? pred[i]=1 : pred[i] = 0;
+
+    }
+    return pred;
+
+}
 }
 

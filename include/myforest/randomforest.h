@@ -14,11 +14,14 @@ public:
     std::optional<int> seed_;
     int m_try;
     int n_trees;
+    int num_features;
+    bool is_fitted = false;
     DataSet random_samples(DataSet& v, float size = 0.6);
     void set_seed(int seed);
     void fit(DataSet& v);
 
     float single_predict(std::vector<float>& x);
+    std::vector<int> predict(std::vector<float>& x);
 
 private:
 

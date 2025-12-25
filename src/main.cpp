@@ -40,25 +40,25 @@ int main()
                          3,3,1,13,
                          5,3,2,20};
 
-    std::vector<float> v{6, 3, 7, 4,
+    std::vector<float> v{6, 1, 2, 4,
                         6, 9, 2, 6,
-                        7, 4, 3, 7,
-                        7, 2, 5, 4,
-                        1, 7, 5, 1,
+                        7, 2, 0, 7,
+                        7, 2, 3, 4,
+                        1, 7, 1, 1,
                         4, 0, 9, 5,
                         8, 0, 9, 2,
-                        6, 3, 8, 2,
-                        4, 2, 6, 4,
-                        8, 6, 1, 3};
+                        6, 3, 2, 2,
+                        4, 9, 6, 4,
+                        8, 6, 10, 3};
 
 
-    std::vector<float> y{1,0,0,0,1,1,1,0,0,1};
+    std::vector<float> y{0,1,0,0,1,1,1,0,1,1};
 
-    std::vector<float> x2{8,6,1,3};
-
+    std::vector<float> x2{8,11,11,3};
+    
     myforest::DataSet data(v, y, 10, 4);
     
-    myforest::RandomForest rf(100, 3);
+    myforest::RandomForest rf(100, 2);
     
     rf.fit(data);
 

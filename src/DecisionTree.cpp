@@ -16,6 +16,8 @@ DecisionTree::DecisionTree(int max_depth_):
     Node root_node;}
 
 float DecisionTree::gini_score(int pos_score, int neg_score) const{
+    if (pos_score==0 && neg_score ==0) throw std::invalid_argument("No values specified for positive and negative scores.");
+
     float total = pos_score+neg_score;
     float gini = 1-((pos_score/total)*(pos_score/total) + (neg_score/total)*(neg_score/total));
     return gini;
@@ -76,8 +78,8 @@ SplitResult DecisionTree::best_split(const DataSet& data, bool in_rf, int m_try)
 
     //definition of variables
     float best_w_gini = 1;
-    float best_threshold;
-    int split_feature;
+    float best_threshold = -1;
+    int split_feature = -1;
     std::vector<int> top_left_index;
     std::vector<int> top_right_index;
     bool is_pure_gini = false;
