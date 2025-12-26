@@ -15,7 +15,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pybind11)
 
-#C++ core library
 add_library(myforest
   src/DecisionTree.cpp
   src/RandomForest.cpp
@@ -28,9 +27,12 @@ target_include_directories(myforest PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-#Python extension module
 pybind11_add_module(_treelib
   src/bindings.cpp
+)
+install(TARGETS _treelib LIBRARY DESTINATION treelib)
+set_target_properties(_treelib PROPERTIES
+  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/python/treelib"
 )
 
 target_link_libraries(_treelib PRIVATE
@@ -38,7 +40,6 @@ target_link_libraries(_treelib PRIVATE
   Python::Module
 )
 
-# CLI executable
 add_executable(RandomForestCPP
   src/main.cpp
 )

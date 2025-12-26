@@ -1,3 +1,3 @@
-from ._treelib import ping, echo_int  # ré-export
+from ._treelib import RandomForest
 
-__all__ = ["ping", "echo_int"]
+__all__ = ["RandomForest"]
