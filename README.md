@@ -10,7 +10,7 @@ The project is intended mainly for **learning and experimentation**, rather than
 ## Installation
 
 ```bash 
-git clone "https://github.com/fantinsib/random_forest_cpp.git"
+git clone https://github.com/fantinsib/random_forest_cpp.git
 cd random_forest_cpp
 pip install -e .
 ```
