@@ -30,6 +30,6 @@ Please see the [demo notebook](https://github.com/fantinsib/random_forest_cpp/bl
 
 • Data is internally stored as 1D contiguous arrays
 
-• Tree construction follows standard CART-style splits
+• Tree construction follows standard CART-style splits (Gini)
 
 • Random Forest uses bootstrap sampling and random feature subsampling (m_try)
