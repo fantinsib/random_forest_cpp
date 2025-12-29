@@ -1,5 +1,6 @@
 #include "myforest/dataset.h"
 #include <iostream>
+#include <stdexcept>
 
 
 namespace myforest{
@@ -41,13 +42,14 @@ std::pair<int, int> DataSet::count_classes() const {
     for (auto i : y_){
 
         if (i==0) neg_count++;
-        if (i==1) pos_count++;
+        else if (i==1) pos_count++;
+        else {throw std::invalid_argument("DataSet.count_classes() : only binary labels allowed ({0,1})");}
     }
 
     return {pos_count, neg_count};
 }
 
-DataSet DataSet::index_split(std::vector<int>& index) const {
+DataSet DataSet::index_split(const std::vector<int>& index) const {
     // Returns a subsplit of the dataset object of the rows from the specified index
 
     //vector index references nth row of the dataset
@@ -55,6 +57,7 @@ DataSet DataSet::index_split(std::vector<int>& index) const {
     std::vector<float> y_results;
 
     for (auto i : index){
+        if (i<0 || i>= n_rows_) {throw std::out_of_range("DataSet.index_split : row index out of bounds");}
         for (int col = 0; col < n_cols_; col++){
             X_results.push_back(iloc_x(i, col));
 
