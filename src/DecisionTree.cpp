@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <random>
 #include <numeric>
+#include <stdexcept>
 
 
 
@@ -23,14 +24,15 @@ float DecisionTree::gini_score(int pos_score, int neg_score) const{
     return gini;
 }
 
-const std::pair<int, int> DecisionTree::count(const std::vector<float>& y) const{
+std::pair<int, int> DecisionTree::count(const std::vector<float>& y) const{
     int count_positive = 0;
     int count_negative = 0;
 
     for (auto i : y){
 
         if (i == 1) {count_positive+=1;}
-        if (i == 0) {count_negative+=1;}
+        else if (i == 0) {count_negative+=1;}
+        else {throw std::invalid_argument("DecisionTree.count() : non-binary label");}
     }
     return {count_positive, count_negative};
 }
@@ -238,7 +240,7 @@ void DecisionTree::build_tree(myforest::Node& node, const DataSet& data, int dep
 }
 
 void DecisionTree::print_tree_rec(const Node& node,const std::string& prefix,bool is_left,bool is_last) const {
-    // branche + label
+
     std::cout << prefix
               << (is_last ? "└── " : "├── ")
               << (is_left ? "yes: " : "no:  ");
@@ -254,24 +256,23 @@ void DecisionTree::print_tree_rec(const Node& node,const std::string& prefix,boo
               << std::fixed << std::setprecision(4) << node.threshold
               << '\n';
 
-    // Préfixe pour les enfants : si ce noeud n'est pas "dernier", on garde le trait vertical
+    
     const std::string child_prefix = prefix + (is_last ? "    " : "│   ");
 
     const bool has_left  = (node.left_child  != nullptr);
     const bool has_right = (node.right_child != nullptr);
 
-    // Pour décider du "last", on regarde si l'autre enfant existe
     if (has_left) {
-        const bool left_is_last = !has_right;                 // s'il n'y a pas de right, left est le dernier
+        const bool left_is_last = !has_right;                 
         print_tree_rec(*node.left_child, child_prefix, true, left_is_last);
     }
     if (has_right) {
-        print_tree_rec(*node.right_child, child_prefix, false, true); // right est le dernier (quand il existe)
+        print_tree_rec(*node.right_child, child_prefix, false, true); 
     }
 }
 
 void DecisionTree::print_tree() const {
-    // Racine
+    if (fitted != true) {throw std::runtime_error(".print_tree() called, but tree was never fitted");}
     if (root_node.is_leaf) {
         std::cout << "Leaf(id=" << root_node.node_id
                   << ") → class=" << root_node.predicted_class << '\n';
@@ -283,14 +284,13 @@ void DecisionTree::print_tree() const {
               << std::fixed << std::setprecision(4) << root_node.threshold
               << '\n';
 
-    // Enfants : ici on force un préfixe de base non vide
     if (root_node.left_child)
         print_tree_rec(*root_node.left_child, "", true,  true);   // is_left, is_last
     if (root_node.right_child)
         print_tree_rec(*root_node.right_child, "", false, true);
 }
 
-int DecisionTree::iterate_tree(Node& node, const std::vector<float>& s) const {
+int DecisionTree::iterate_tree(const Node& node, const std::vector<float>& s) const {
 
 
     int feature = node.feature_index;
@@ -314,12 +314,12 @@ int DecisionTree::iterate_tree(Node& node, const std::vector<float>& s) const {
 
     }
 
-    return -1;
+    throw std::logic_error("Unreachable state in iterate_tree");
 }
 
 std::vector<int> DecisionTree::predict(const std::vector<float>& s){
 
-    if (fitted != true) throw std::runtime_error("Tree was not fitted.");
+    if (fitted != true) throw std::runtime_error(".predict() called but tree has not been fitted");
     if (s.size() % num_features != 0) throw std::runtime_error("Sample does not have the correct size");
 
     int num_samples = s.size()/num_features;

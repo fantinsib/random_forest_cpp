@@ -12,13 +12,13 @@ class DataSet
 {
 public:
     /**
-     * @brief Constructs a DataSet from features X and targets Y.
-     * @param X Flattened feature vector (expected size = n_rows * n_cols).
-     * @param Y Target vector (expected size = n_rows).
-     * @param n_rows Number of samples.
-     * @param n_cols Number of features per sample.
+     * @brief Constructs a DataSet from features X and targets Y
+     * @param X Flattened feature vector (expected size = n_rows * n_cols)
+     * @param Y Target vector (expected size = n_rows)
+     * @param n_rows Number of samples
+     * @param n_cols Number of features per sample
      * @throws std::invalid_argument if X.size(), Y.size(), n_rows and n_cols values are incoherent 
-     * @note X uses row-major order: X[col + row * n_cols].
+     * @note X uses row-major order: X[col + row * n_cols]
      */
 
     DataSet(std::vector<float> X, std::vector<float> Y, int n_rows, int n_cols);
