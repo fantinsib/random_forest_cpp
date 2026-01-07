@@ -3,7 +3,7 @@
 
 This repository contains a small, experimental implementation of a Random Forest engine written in C++, with Python bindings.
 
-The project is intended mainly for **learning and experimentation**, rather than production use.
+The project is intended mainly for **learning and experimentation**, rather than production use. An upgraded version can be found in the [arboria project](https://github.com/fantinsib/arboria)(WIP). Feel free to check it!
 
 ---
 
